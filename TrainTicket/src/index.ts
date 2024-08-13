@@ -1,8 +1,12 @@
 import { Hono } from 'hono'
 import { PrismaClient } from '@prisma/client'
+import stationGroup from './api/stations'
 
-const app = new Hono()
+const app = new Hono().basePath('/api')
 const prisma=new PrismaClient()
+
+app.route('/stations', stationGroup)
+
 
 app.get('/',async(c)=>{
   return c.json("Welcome to Train Ticket Booking System")
@@ -260,67 +264,7 @@ app.delete('/delete/train/:number',async(c)=>{
   }
 })
 
-app.post('/create/station/new',async(c)=>{
-  const {user_name,stationId,stationName}=await c.req.json()
-  try
-  {
-    const admin=await prisma.user.findFirst({
-      where:{
-        user_name:user_name
-      }
-    })
-    if(admin)
-    {
-      if(admin.role==='ADMIN')
-      {
-        const station=await prisma.station.create({
-          data:{
-            stationId:stationId,
-            stationName:stationName
-          }
-        })
-        return c.json("Station added Successfully"+"\n"+station)
-      }
-      else
-      {
-        return c.json("User not allowed to enter the details")
-      }
-    }
-    else
-    {
-      return c.json("Admin not found")
-    }
-  } 
-  catch(e)
-  {
-    return c.json("Error")
-  }
-  finally
-  {
-    await prisma.$disconnect()
-  }
-})
 
-app.delete('/delete/station/:id',async(c)=>{
-  const {id}=c.req.param()
-  try
-  {
-    const station=await prisma.station.delete({
-      where:{
-        stationId:id
-      }
-    })
-    return c.json("Station deleted Successfully"+"\n"+station)
-  }
-  catch(e)
-  {
-    return c.json("Error")
-  }
-  finally
-  {
-    await prisma.$disconnect()
-  }
-})
 
 app.post('/create/booking/new',async(c)=>{
   const {user_name,trainNo,noOfSeats}=await c.req.json()
@@ -442,33 +386,7 @@ app.get('/trains/:number',async(c)=>{
   }
 })
 
-app.get('/stations/:id',async(c)=>{
-  const {id}=c.req.param()
-  try
-  {
-    const station=await prisma.station.findUnique({
-      where:{
-        stationId:id
-      }
-    })
-    if(station)
-    {
-      return c.json(station)
-    }
-    else
-    {
-      return c.json("Station Id is not valid")
-    }
-  }
-  catch(e)
-  {
-    return c.json("Error")
-  }
-  finally
-  {
-    await prisma.$disconnect()
-  }
-})
+
 
 app.get('/bookings/:id',async(c)=>{
   const {id}=c.req.param()
@@ -516,22 +434,6 @@ app.get('/trains',async(c)=>{
       }
     })
     return c.json(trains)
-  }
-  catch(e)
-  {
-    return c.json("Error")
-  }
-  finally
-  {
-    await prisma.$disconnect()
-  }
-})
-
-app.get('/stations',async(c)=>{
-  try
-  {
-    const stations=await prisma.station.findMany()
-    return c.json(stations)
   }
   catch(e)
   {
