@@ -1,7 +1,9 @@
 {
   "name": "trainticket",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "format": "prettier --write .",
+    "check": "prettier --check ."
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
@@ -9,6 +11,7 @@
     "prisma": "^5.18.0"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "prettier": "3.3.3"
   }
 }
