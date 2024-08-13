@@ -1,5 +1,5 @@
 {
-  "name": "TrainTicket",
+  "name": "trainticket",
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },

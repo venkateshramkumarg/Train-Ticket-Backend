@@ -4,9 +4,11 @@ import { PrismaClient } from '@prisma/client'
 const app = new Hono()
 const prisma=new PrismaClient()
 
+app.get('/',async(c)=>{
+  return c.json("Welcome to Train Ticket Booking System")
+})
 
-
-app.post('/postUser',async(c)=>{
+app.post('/create/user/new',async(c)=>{
   const {user_name,password,email}=await c.req.json()
   try
   {
@@ -29,7 +31,54 @@ app.post('/postUser',async(c)=>{
   }
 })
 
-app.post('/postAdmin',async(c)=>{
+app.delete('/delete/user/:name',async(c)=>{
+  const {name}=c.req.param()
+  try
+  {
+    const user=await prisma.user.delete({
+      where:{
+        user_name:name
+      }
+    })
+    return c.json("User deleted Successfully"+"\n"+user)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.put('/update/user/:name',async(c)=>{
+  const {name}=c.req.param()
+  const {password,email}=await c.req.json()
+  try
+  {
+    const user=await prisma.user.update({
+      where:{
+        user_name:name
+      },
+      data:{
+        password:password,
+        email:email
+      }
+    })
+    return c.json("User updated Successfully"+"\n"+user)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.post('/create/admin/new',async(c)=>{
   const {user_name,password,email}=await c.req.json()
   try
   {
@@ -53,7 +102,54 @@ app.post('/postAdmin',async(c)=>{
   }
 })
 
-app.post('/checkUser',async(c)=>{
+app.delete('/delete/admin/:name',async(c)=>{
+  const {name}=c.req.param()
+  try
+  {
+    const user=await prisma.user.delete({
+      where:{
+        user_name:name
+      }
+    })
+    return c.json("Admin deleted Successfully"+"\n"+user)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.put('/update/admin/:name',async(c)=>{
+  const {name}=c.req.param()
+  const {password,email}=await c.req.json()
+  try
+  {
+    const user=await prisma.user.update({
+      where:{
+        user_name:name
+      },
+      data:{
+        password:password,
+        email:email
+      }
+    })
+    return c.json("Admin updated Successfully"+"\n"+user)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.post('/check/user',async(c)=>{
   const {user_name,password}=await c.req.json()
   try
   {
@@ -92,7 +188,7 @@ app.post('/checkUser',async(c)=>{
   }
 })
 
-app.post('/addTrain',async(c)=>{
+app.post('/create/train/new',async(c)=>{
   const {user_name,trainNo,trainName,noOfSeatsAvailable,departureDate,stationIds}=await c.req.json()
   console.log(trainNo+trainName+noOfSeatsAvailable+departureDate+stationIds)
   try
@@ -142,7 +238,29 @@ app.post('/addTrain',async(c)=>{
   }
 })
 
-app.post('/addStation',async(c)=>{
+app.delete('/delete/train/:number',async(c)=>{
+  const {number}=c.req.param()
+  let trainNo=Number(number)
+  try
+  {
+    const train=await prisma.train.delete({
+      where:{
+        trainNo:trainNo
+      }
+    })
+    return c.json("Train deleted Successfully"+"\n"+train)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.post('/create/station/new',async(c)=>{
   const {user_name,stationId,stationName}=await c.req.json()
   try
   {
@@ -183,7 +301,28 @@ app.post('/addStation',async(c)=>{
   }
 })
 
-app.post('/addBooking',async(c)=>{
+app.delete('/delete/station/:id',async(c)=>{
+  const {id}=c.req.param()
+  try
+  {
+    const station=await prisma.station.delete({
+      where:{
+        stationId:id
+      }
+    })
+    return c.json("Station deleted Successfully"+"\n"+station)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.post('/create/booking/new',async(c)=>{
   const {user_name,trainNo,noOfSeats}=await c.req.json()
   try
   {
@@ -240,7 +379,29 @@ app.post('/addBooking',async(c)=>{
   }
 })
 
-app.get('/getTrains/:number',async(c)=>{
+app.delete('/delete/booking/:id',async(c)=>{
+  const {id}=c.req.param()
+  const booking_id=Number(id)
+  try
+  {
+    const booking=await prisma.bookings.delete({
+      where:{
+        booking_id:booking_id
+      }
+    })
+    return c.json("Booking deleted Successfully"+"\n"+booking)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.get('/trains/:number',async(c)=>{
   const a=c.req.param()
   console.log(a)
   let {number}=c.req.param()
@@ -277,6 +438,107 @@ app.get('/getTrains/:number',async(c)=>{
     return c.json("Error")
   }
   finally{
+    await prisma.$disconnect()
+  }
+})
+
+app.get('/stations/:id',async(c)=>{
+  const {id}=c.req.param()
+  try
+  {
+    const station=await prisma.station.findUnique({
+      where:{
+        stationId:id
+      }
+    })
+    if(station)
+    {
+      return c.json(station)
+    }
+    else
+    {
+      return c.json("Station Id is not valid")
+    }
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.get('/bookings/:id',async(c)=>{
+  const {id}=c.req.param()
+  const booking_id=Number(id)
+  try
+  {
+    const booking=await prisma.bookings.findUnique({
+      where:{
+        booking_id:booking_id
+      }
+    })
+    if(booking)
+    {
+      return c.json(booking)
+    }
+    else
+    {
+      return c.json("Booking Id is not valid")
+    }
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.get('/trains',async(c)=>{
+  try
+  {
+    const trains=await prisma.train.findMany({
+      select:{
+        trainName:true,
+        trainNo:true,
+        noOfSeatsAvailable:true,
+        departureDate:true,
+        trainStations:{
+          select:{
+            station:true
+          }
+        }
+      }
+    })
+    return c.json(trains)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
+    await prisma.$disconnect()
+  }
+})
+
+app.get('/stations',async(c)=>{
+  try
+  {
+    const stations=await prisma.station.findMany()
+    return c.json(stations)
+  }
+  catch(e)
+  {
+    return c.json("Error")
+  }
+  finally
+  {
     await prisma.$disconnect()
   }
 })
