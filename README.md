@@ -19,7 +19,7 @@ Welcome to the Train Ticket Booking System. This application allows administrato
 
 1. Clone the repository:
     ```sh
-    git clone <repository-url>
+    git clone https://github.com/venkateshramkumarg/ecommerce_backend.git
     cd TrainTicket
     ```
 
