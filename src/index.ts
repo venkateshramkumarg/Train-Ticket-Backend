@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { PrismaClient } from '@prisma/client';
 import stationGroup from './api/stations';
 import usersGroup from './api/users';
 import adminGroup from './api/admin';
